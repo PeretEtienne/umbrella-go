@@ -12,7 +12,11 @@ import (
 func RegisterUserRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
-	userController := controllers.NewUserController(userService)
+
+	medicalDoctorRepo := repositories.NewMedicalDoctorRepository(db)
+	medicalDoctorService := services.NewMedicalDoctorService(medicalDoctorRepo)
+
+	userController := controllers.NewUserController(userService, medicalDoctorService)
 
 	router.GET("/users/:id", userController.GetUser)
 	router.POST("/users", userController.CreateUser)

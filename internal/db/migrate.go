@@ -12,6 +12,7 @@ func Migrate(db *gorm.DB) {
 
 	err := db.AutoMigrate(
 		&models.User{},
+		&models.MedicalDoctor{},
 	)
 	if err != nil {
 		log.Fatalf("Error during migration: %v", err)

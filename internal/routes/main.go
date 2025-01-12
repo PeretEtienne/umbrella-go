@@ -18,6 +18,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.Use(middlewares.AuthMiddleware())
 	{
 		RegisterUserRoutes(api, db)
+		RegisterMedicalDoctorRoutes(api, db)
 	}
 
 	return router

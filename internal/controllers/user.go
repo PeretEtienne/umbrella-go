@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"umbrella/internal/dto"
 	"umbrella/internal/models"
@@ -10,11 +11,18 @@ import (
 )
 
 type UserController struct {
-	UserService *services.UserService
+	UserService          *services.UserService
+	MedicalDoctorService *services.MedicalDoctorService
 }
 
-func NewUserController(userService *services.UserService) *UserController {
-	return &UserController{UserService: userService}
+func NewUserController(
+	userService *services.UserService,
+	medicalDoctorService *services.MedicalDoctorService,
+) *UserController {
+	return &UserController{
+		UserService:          userService,
+		MedicalDoctorService: medicalDoctorService,
+	}
 }
 
 func (c *UserController) GetUser(ctx *gin.Context) {
@@ -28,8 +36,9 @@ func (c *UserController) GetUser(ctx *gin.Context) {
 }
 
 func (c *UserController) CreateUser(ctx *gin.Context) {
-	var userDTO dto.CreateUserDTO
+	var userDTO dto.CreateUserPayloadDTO
 	if err := ctx.ShouldBindJSON(&userDTO); err != nil {
+		fmt.Println("Error: ", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -45,6 +54,24 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	if userDTO.Type == "medical_doctor" {
+		medicalDoctor := models.MedicalDoctor{
+			Institution: userDTO.Institution,
+			Address:     userDTO.Address,
+			ZipCode:     userDTO.ZipCode,
+			City:        userDTO.City,
+			Country:     userDTO.Country,
+			UserID:      createdUser.ID,
+		}
+
+		_, err := c.MedicalDoctorService.CreateMedicalDoctor(medicalDoctor)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 	}
 
 	response := dto.CreateUserResponseDTO{

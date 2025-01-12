@@ -6,6 +6,12 @@ type CreateUserDTO struct {
 	Password  string `json:"password" binding:"required,min=8,max=255"`
 	Email     string `json:"email" binding:"required,email"`
 	IsCra     bool   `json:"isCra" default:"false"`
+	Type      string `json:"type" binding:"required,oneof=medical_doctor user"`
+}
+
+type CreateUserPayloadDTO struct {
+	CreateUserDTO
+	CreateMedicalDoctorDTO
 }
 
 type CreateUserResponseDTO struct {
