@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  app:
+    image: cosmtrek/air
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    environment:
+      - GO_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=umbrella_api
+      - DB_NAME=umbrella_api
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: umbrella_api
+      POSTGRES_PASSWORD: umbrella_api
+      POSTGRES_DB: umbrella_api
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
